@@ -50,7 +50,7 @@ Create a new feed to share. Call `feed.append` to add blocks and `feed.finalize`
 
 #### `var feed = drive.get(id)`
 
-Access a finalized feed by it's id. By getting a feed you'll start replicating this from other peers you are connected too as well.
+Access a finalized feed by its id. By getting a feed you'll start replicating this from other peers you are connected too as well.
 
 #### `feed.get(index, callback)`
 
