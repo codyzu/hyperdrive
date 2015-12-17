@@ -54,7 +54,7 @@ Access a finalized feed by it's id
 
 #### `feed.get(index, callback)`
 
-Get a block from the the feed.
+Get a block from the the feed. If you `.get` a block index that hasn't been downloaded yet this method will wait for that block be downloaded before calling the callback.
 
 #### `feed.append(block, [callback])`
 
@@ -71,9 +71,9 @@ After the callback has been called `feed.blocks` is guaranteed to be populated. 
 
 #### `var blocks = feed.blocks`
 
-Property containing the number of blocks this feed has. This is only known after a block has been fetched.
+Property containing the number of blocks this feed has. This is only known after at least one block has been fetched.
 
-#### `var has = feed.has(indes)`
+#### `var has = feed.has(index)`
 
 Boolean indicating wheather or not a block has been downloaded. Note that since this method is synchronous you have to wait for the feed to open before calling it.
 
