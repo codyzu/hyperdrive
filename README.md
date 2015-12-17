@@ -46,7 +46,7 @@ peer stream somewhere else to start replicating the feeds
 
 #### `var feed = drive.add()`
 
-Add a new feed to share. Call `.append` to add blocks and `.finalize` when you're done and ready to share this feed.
+Add a new feed to share. Call `feed.append` to add blocks and `feed.finalize` when you're done and ready to share this feed.
 
 #### `var feed = drive.get(id)`
 
@@ -64,22 +64,18 @@ Append a block of data to a new feed. You can only append to a feed that hasn't 
 
 Finalize a feed. Will set `feed.id` when done. This is the `id` that identifies this feed.
 
-#### `var opened = feed.opened`
+#### `feed.ready([callback])`
 
-Boolean variable that indicates wheather or not the internal feed state has been loaded yet. Then it is loaded `open` is emitted as well.
+Call this method to wait for the feed to have enough metadata to populate its internal state.
+After the callback has been called `feed.blocks` is guaranteed to be populated. You *do not* have to call `feed.ready` before trying to `.get` a block. This method is just available for convenience.
 
 #### `var blocks = feed.blocks`
 
 Property containing the number of blocks this feed has. This is only known after a block has been fetched.
 
-#### `var has = feed.has(block)`
+#### `var has = feed.has(indes)`
 
 Boolean indicating wheather or not a block has been downloaded. Note that since this method is synchronous you have to wait for the feed to open before calling it.
-
-#### `feed.ready([callback])`
-
-Call this method to wait for the feed to have enough metadata to populate its internal state.
-After the callback has been called `feed.blocks` is guaranteed to be populated. You *do not* have to call `feed.ready` before trying to `.get` a block. This method is just available for convenience.
 
 ## License
 
