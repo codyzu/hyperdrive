@@ -29,84 +29,11 @@ Main things missing are:
 
 ## Usage
 
-First create a new feed to share
-
 ``` js
-var hyperdrive = require('hyperdrive')
-var fs = require('fs')
-var levelup = require('levelup')
-
-var aLevelDB = levelup('./my-drive')
-var drive = hyperdrive(aLevelDB)
-
-var pack = drive.add()
-
-var stream = pack.entry({
-  name: 'my-file.txt',
-  mode: 0644
-})
-
-fs.createReadStream('my-file.txt').pipe(stream)
-
-pack.finalize(function () {
-  var link = pack.id.toString('hex')
-  console.log(link, '<-- this is your hyperdrive link')
-})
-```
-
-Then to share it
-
-``` js
-var disc = require('discovery-channel')()
-var hyperdrive = require('hyperdrive')
-var net = require('net');
-var levelup = require('levelup')
-var aLevelDB = levelup('./mydb')
-var drive = hyperdrive(aLevelDB)
-
-var link = new Buffer({your-hyperdrive-link-from-the-above-example}, 'hex')
-
-var server = net.createServer(function (socket) {
-  socket.pipe(drive.createPeerStream()).pipe(socket)
-})
-
-server.listen(0, function () {
-  function ann () {
-    // discovery-channel currently only works with 20 bytes hashes
-    disc.announce(link.slice(0, 20), server.address().port)
-  }
-
-  ann()
-  setInterval(ann, 10000)
-
-  var lookup = disc.lookup(link.slice(0, 20))
-
-  lookup.on('peer', function (ip, port) {
-    var socket = net.connect(port, ip)
-    socket.pipe(drive.createPeerStream()).pipe(socket)
-  })
-})
-```
-
-If you run this code on multiple computers you should be able to access
-the content in the feed by doing
-
-``` js
-var feed = drive.get(link) // the link identifies/verifies the content
-
-feed.get(0, function (err, entry) { // get the first entry
-  console.log(entry) // prints {name: 'my-file.txt', ...}
-  var content = drive.get(entry)
-  content.get(0, function (err, data) {
-    console.log('first block of the file', data)
-    content.get(1, ...)
-  })
-})
+// TODO: add new example
 ```
 
 ## API
-
-## Stability: UNSTABLE, likely to have major changes
 
 #### `var drive = hyperdrive(db)`
 
@@ -117,77 +44,42 @@ Create a new hyperdrive instance. db should be a [levelup](https://github.com/le
 Create a new peer replication duplex stream. This stream should be piped together with another
 peer stream somewhere else to start replicating the feeds
 
-#### `var archive = drive.add()`
+#### `var feed = drive.add()`
 
-Add a new archive to share.
+Add a new feed to share. Call `.append` to add blocks and `.finalize` when you're done and ready to share this feed.
 
-#### `var stream = archive.entry(fileInfo, [cb])`
+#### `var feed = drive.get(id)`
 
-Add a new file entry to the file archive. `fileInfo` should look like this
-
-``` js
-{
-  name: 'dir/filename', // required
-  type: 'file or directory', // detected using the mode if not provided
-  mode: 0666, // optional
-  uid: 0, // optional
-  gid: 0, // optional
-  mtime: mtimeInSeconds // optional
-  ctime: ctimeInSeconds // optional
-}
-```
-
-The stream returned is a writable stream. You should write the file contents to that.
-If you are writing a directory the stream will be `null`.
-
-Optionally you can provide a callback that is called when the content has been written
-
-#### `archive.finalize([cb])`
-
-Finalize the archive. After the callback has been called you can get the feed `id`
-by accessing `archive.id`.
-
-#### `var feed = drive.get(id_or_entry)`
-
-Access a feed by it's id or entry object.
-The entry object looks like this
-
-``` js
-{
-  type: 'metadata or file',
-  value: optionalValueCorrespondingToTheType,
-  link: {
-    id: feedId,
-    blocks: blocksInFeed
-  }
-}
-```
-
-If you just pass in a `feedId` the type will default to `metadata`.
+Access a finalized feed by it's id
 
 #### `feed.get(index, callback)`
 
 Get a block from the the feed.
 
-* If the feed is an metadata feed the return value will be an `entry` object.
-* If the feed is a file feed it will be a buffer.
+#### `feed.append(block, [callback])`
 
-#### `var stream = feed.createStream()`
+Append a block of data to a new feed. You can only append to a feed that hasn't been finalized.
 
-Create a readable stream of all entries in the feed.
-The values will be of the same type as described in `feed.get`
+#### `feed.finalize([callback])`
 
-#### `var cursor = feed.cursor()`
+Finalize a feed. Will set `feed.id` when done. This is the `id` that identifies this feed.
 
-If the feed is a file feed you can create a random access cursor by calling `var cursor = feed.cursor()`.
+#### `var opened = feed.opened`
 
-#### `cursor.read(byteOffset, callback)`
+Boolean variable that indicates wheather or not the internal feed state has been loaded yet. Then it is loaded `open` is emitted as well.
 
-Will return a buffer stored at that byte offset in the file.
+#### `var blocks = feed.blocks`
 
-#### `cursor.next(callback)`
+Property containing the number of blocks this feed has. This is only known after a block has been fetched.
 
-Will return the next buffer at the current cursor position.
+#### `var has = feed.has(block)`
+
+Boolean indicating wheather or not a block has been downloaded. Note that since this method is synchronous you have to wait for the feed to open before calling it.
+
+#### `feed.ready([callback])`
+
+Call this method to wait for the feed to have enough metadata to populate its internal state.
+After the callback has been called `feed.blocks` is guaranteed to be populated. You *do not* have to call `feed.ready` before trying to `.get` a block. This method is just available for convenience.
 
 ## License
 

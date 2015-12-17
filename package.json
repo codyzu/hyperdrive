@@ -23,7 +23,7 @@
     "from2": "^2.1.0",
     "last-one-wins": "^1.0.0",
     "length-prefixed-stream": "^1.4.0",
-    "merkle-tree-stream": "^1.0.2",
+    "merkle-tree-stream": "^2.0.0",
     "numeric-id-map": "^1.1.0",
     "octal": "^1.0.0",
     "protocol-buffers": "^3.1.3",
