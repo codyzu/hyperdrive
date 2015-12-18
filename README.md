@@ -44,13 +44,21 @@ Create a new hyperdrive instance. db should be a [levelup](https://github.com/le
 Create a new peer replication duplex stream. This stream should be piped together with another
 peer stream somewhere else to start replicating the feeds
 
-#### `var feed = drive.createFeed()`
+#### `var feed = drive.add()`
 
-Create a new feed to share. Call `feed.append` to add blocks and `feed.finalize` when you're done and ready to share this feed.
+Create a new feed. Call `feed.append` to add blocks and `feed.finalize` when you're done and ready to share this feed.
 
 #### `var feed = drive.get(id)`
 
 Access a finalized feed by its id. By getting a feed you'll start replicating this from other peers you are connected too as well.
+
+#### `drive.remove(id, [callback])`
+
+Removes a feed from the drive.
+
+#### `stream = drive.list()`
+
+Returns a readable stream that will emit the `id` of all feeds stored in the drive.
 
 #### `feed.get(index, callback)`
 
