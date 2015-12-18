@@ -79,8 +79,9 @@ stream.pipe(anotherDrive.createPeerStream()).pipe(stream)
 
 To find other hyperdrive peers on the internet sharing feeds we could use a peer discovery module such as [discovery-channel](https://github.com/maxogden/discovery-channel)
 
-```
+``` js
 // lets find some hyperdrive peers on the internet sharing or interested in our feed
+
 var disc = require('discovery-channel')() // npm install discovery-channel
 var net = require('net')
 
