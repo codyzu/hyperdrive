@@ -1,8 +1,7 @@
-message Link {
+message Feed {
   optional bytes pointer = 4;
   required bytes id = 1;
   required uint64 blocks = 2;
-  repeated uint64 index = 3;
 }
 
 message File {
@@ -18,7 +17,7 @@ message File {
 message Entry {
   optional string type = 1;
   required bytes value = 2;
-  optional Link link = 3;
+  optional Feed link = 3;
 }
 
 message Handshake {
