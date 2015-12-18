@@ -158,7 +158,7 @@ Get a block from the the feed. If you `.get` a block index that hasn't been down
 
 #### `feed.append(block, [callback])`
 
-Append a block of data to a new feed. You can only append to a feed that hasn't been finalized.
+Append a block of data to a new feed. You can only append to a feed that hasn't been finalized. Optionally you can pass in an array of blocks instead of single one to add multiple blocks at the same time.
 
 #### `feed.finalize([callback])`
 
