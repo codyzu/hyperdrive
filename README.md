@@ -39,14 +39,9 @@ Main things missing are:
 
 Create a new hyperdrive instance. db should be a [levelup](https://github.com/level/levelup) instance.
 
-#### `var stream = drive.createPeerStream()`
-
-Create a new peer replication duplex stream. This stream should be piped together with another
-peer stream somewhere else to start replicating the feeds
-
 #### `var stream = drive.createWriteStream()`
 
-Create a new writable stream that adds a new feed and appends blocks to written to this stream.
+Create a new writable stream that adds a new feed and appends blocks to it.
 After the stream has been ended (`finish` has been emitted) you can access `stream.id` and `stream.blocks` to get the feed metadata.
 
 #### `var stream = drive.createReadStream(id, [options])`
@@ -63,6 +58,12 @@ Create a readable stream that reads from a the feed specified by `id`. Optionall
 #### `var stream = drive.list()`
 
 Returns a readable stream that will emit the `id` of all feeds stored in the drive.
+
+#### `var stream = drive.createPeerStream()`
+
+Create a new peer replication duplex stream. This stream should be piped together with a remote peer's stream to the start replicating feeds.
+
+## Feeds
 
 #### `var feed = drive.add()`
 
