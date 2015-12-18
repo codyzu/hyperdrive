@@ -65,6 +65,8 @@ Create a new peer replication duplex stream. This stream should be piped togethe
 
 ## Feeds
 
+Everytime you write a stream of data to hyperdrive it gets added to an underlying binary feed. Feeds give you more low-level access to the data stored through the following api.
+
 #### `var feed = drive.add()`
 
 Create a new feed. Call `feed.append` to add blocks and `feed.finalize` when you're done and ready to share this feed.
