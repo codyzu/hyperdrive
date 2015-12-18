@@ -1,7 +1,9 @@
 var subleveldown = require('subleveldown')
-var feed = require('./lib/feed2')
+var feed = require('./lib/feed')
 var swarm = require('./lib/swarm')
 var messages = require('./lib/messages')
+var writeStream = require('./lib/write-stream')
+var readStream = require('./lib/read-stream')
 
 module.exports = Hyperdrive
 
@@ -21,6 +23,14 @@ function Hyperdrive (db, opts) {
 
 Hyperdrive.prototype.createPeerStream = function () {
   return this.swarm.createStream()
+}
+
+Hyperdrive.prototype.createWriteStream = function (opts) {
+  return writeStream(this, opts)
+}
+
+Hyperdrive.prototype.createReadStream = function (id, opts) {
+  return readStream(this, id, opts)
 }
 
 Hyperdrive.prototype.list = function () {

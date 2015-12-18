@@ -44,6 +44,26 @@ Create a new hyperdrive instance. db should be a [levelup](https://github.com/le
 Create a new peer replication duplex stream. This stream should be piped together with another
 peer stream somewhere else to start replicating the feeds
 
+#### `var stream = drive.createWriteStream()`
+
+Create a new writable stream that adds a new feed and appends blocks to written to this stream.
+After the stream has been ended (`finish` has been emitted) you can access `stream.id` and `stream.blocks` to get the feed metadata.
+
+#### `var stream = drive.createReadStream(id, [options])`
+
+Create a readable stream that reads from a the feed specified by `id`. Optionally you can specify the following options:
+
+``` js
+{
+  start: 0, // which block index to start reading from
+  limit: Infinity // how many blocks to read
+}
+```
+
+#### `var stream = drive.list()`
+
+Returns a readable stream that will emit the `id` of all feeds stored in the drive.
+
 #### `var feed = drive.add()`
 
 Create a new feed. Call `feed.append` to add blocks and `feed.finalize` when you're done and ready to share this feed.
@@ -51,10 +71,6 @@ Create a new feed. Call `feed.append` to add blocks and `feed.finalize` when you
 #### `var feed = drive.get(id)`
 
 Access a finalized feed by its id. By getting a feed you'll start replicating this from other peers you are connected too as well.
-
-#### `var stream = drive.list()`
-
-Returns a readable stream that will emit the `id` of all feeds stored in the drive.
 
 #### `feed.get(index, callback)`
 
@@ -77,7 +93,7 @@ After the callback has been called `feed.blocks` is guaranteed to be populated. 
 
 Property containing the number of blocks this feed has. This is only known after at least one block has been fetched.
 
-#### `var has = feed.has(index)`
+#### `var bool = feed.has(index)`
 
 Boolean indicating wheather or not a block has been downloaded. Note that since this method is synchronous you have to wait for the feed to open before calling it.
 
