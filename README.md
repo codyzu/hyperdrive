@@ -52,10 +52,6 @@ Create a new feed. Call `feed.append` to add blocks and `feed.finalize` when you
 
 Access a finalized feed by its id. By getting a feed you'll start replicating this from other peers you are connected too as well.
 
-#### `drive.remove(id, [callback])`
-
-Removes a feed from the drive.
-
 #### `stream = drive.list()`
 
 Returns a readable stream that will emit the `id` of all feeds stored in the drive.
