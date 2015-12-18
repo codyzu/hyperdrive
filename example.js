@@ -5,21 +5,26 @@ function create () {
   return hyperdrive(memdb())
 }
 
+function replicate (a, b) {
+  var stream = a.createPeerStream()
+  stream.pipe(b.createPeerStream()).pipe(stream)
+}
+
 var a = create()
 var b = create()
 
-var streamA = a.createPeerStream()
-var streamB = b.createPeerStream()
+replicate(a, b)
 
-streamA.pipe(streamB).pipe(streamA)
+var ws = a.createWriteStream()
 
-var feed = a.createWriteStream()
+ws.write('hello')
+ws.write('world')
+ws.end(function () {
+  console.log('wrote:', ws.id.toString('hex'))
 
-feed.write('hello')
-feed.write('world')
-feed.write('or verden')
-feed.write('or world')
-feed.end(function () {
-  var feed2 = b.createReadStream(feed.id, {start: 1})
-  feed2.on('data', console.log)
+  var rs = b.createReadStream(ws.id)
+
+  rs.on('data', function (data) {
+    console.log('data: ' + data)
+  })
 })

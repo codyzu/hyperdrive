@@ -29,8 +29,84 @@ Main things missing are:
 
 ## Usage
 
+First lets add a stream of data to hyperdrive
+
 ``` js
-// TODO: add new example
+var level = require('level')
+var hyperdrive = require('hyperdrive')
+
+var db = level('hyperdrive.db')
+var drive = hyperdrive(db) // db can be any levelup instance
+
+var ws = drive.createWriteStream() // lets add some data
+
+ws.write('hello')
+ws.write('world')
+ws.end(function () {
+  // will print e1a31bb8716f0a0487377e22dbc7f0491fb47a712ac21519792a4e32cf56fb6f
+  console.log('data was stored as', ws.id.toString('hex'))
+})
+```
+
+Now to access it create a read stream with the same id
+
+``` js
+var rs = drive.createReadStream('e1a31bb8716f0a0487377e22dbc7f0491fb47a712ac21519792a4e32cf56fb6f')
+
+rs.on('data', function (data) {
+  console.log(data.toString()) // prints 'hello' and 'world'
+})
+```
+
+If we were only interested in the second block of data we can access the low-level feed instead of a read stream
+
+``` js
+var feed = drive.get('e1a31bb8716f0a0487377e22dbc7f0491fb47a712ac21519792a4e32cf56fb6f')
+
+// feeds give us easy random access
+feed.get(1, function (err, block) {
+  console.log(block.toString()) // prints 'world'
+})
+```
+
+To start replicating this feed to other peers we need pipe a peer stream to them.
+
+``` js
+// create a peer stream to start replicating feeds to other peers
+var stream = drive.createPeerStream()
+stream.pipe(anotherDrive.createPeerStream()).pipe(stream)
+```
+
+To find other hyperdrive peers on the internet sharing feeds we could use a peer discovery module such as [discovery-channel](https://github.com/maxogden/discovery-channel)
+
+```
+// lets find some hyperdrive peers on the internet sharing or interested in our feed
+var disc = require('discovery-channel')() // npm install discovery-channel
+var net = require('net')
+
+var id = new Buffer('e1a31bb8716f0a0487377e22dbc7f0491fb47a712ac21519792a4e32cf56fb6f', 'hex')
+var server = net.createServer(onsocket)
+
+server.listen(0, function () {
+  announce()
+  setInterval(announce, 10000)
+
+  var lookup = disc.lookup(id.slice(0, 20))
+
+  lookup.on('peer', function (ip, port) {
+    onsocket(net.connect(port, ip))
+  })
+})
+
+function onsocket (socket) {
+  // connect the peers
+  socket.pipe(drive.createPeerStream()).pipe(socket)
+}
+
+function announce () {
+  // discovery-channel currently only works with 20 bytes hashes
+  disc.announce(id.slice(0, 20), server.address().port)
+}
 ```
 
 ## API
