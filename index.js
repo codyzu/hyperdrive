@@ -24,7 +24,7 @@ Hyperdrive.prototype.createPeerStream = function () {
 }
 
 Hyperdrive.prototype.list = function () {
-  return this._links.createKeyStream()
+  return this._feeds.createKeyStream()
 }
 
 Hyperdrive.prototype.get = function (link, opts) {
